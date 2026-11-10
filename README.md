@@ -12,7 +12,7 @@ Source revision: 44a7ee723ca0ec89a99de98eb6e217b38d3e2b4e.
 npm run dev
 ```
 
-3. Visit http://127.0.0.1:4173 in your browser. Press Ctrl+C in the terminal to stop.
+3. Open the website URL printed in the terminal (normally http://127.0.0.1:4173). If that port is busy, the dev server automatically selects the next available port. Press Ctrl+C in the terminal to stop.
 
 The dev command uses Python 3's built-in static web server. No build step, npm dependencies, `npm install`, or API keys are required. You can also run `python3 -m http.server 4173 --bind 127.0.0.1` directly. If Python is unavailable, serve this folder using your preferred static web server.
 
