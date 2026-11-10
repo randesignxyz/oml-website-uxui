@@ -32,12 +32,19 @@
         gsap.from('header .logo, header nav a', {opacity: 0, y: -8, duration: .5, stagger: .035, clearProps: 'opacity,transform'});
         initial = false;
       }
-      const reveals = app.querySelectorAll('.section .two > *, .section.two > *, .section-head, .image-frame, .news-card, .business-card, .value, .timeline > div, .contact-grid > *, .cta > *, .section > h2, .section > p, .section > .eyebrow, .brand-tabs, #feature');
+      const reveals = app.querySelectorAll('.chairman-opening, .chairman-profile, .chairman-letter, .section .two > *, .section.two > *, .section-head, .image-frame, .news-card, .business-card, .value, .timeline > div, .contact-grid > *, .cta > *, .section > h2, .section > p, .section > .eyebrow, .brand-tabs, #feature');
       reveals.forEach(el => {
         // A parent reveal owns its descendants, preventing stacked transforms.
         if (Array.from(reveals).some(parent => parent !== el && parent.contains(el))) return;
         gsap.from(el, {opacity: .12, y: distance, duration: .65, ease: 'power2.out', clearProps: 'opacity,transform', scrollTrigger: {trigger: el, start: 'top 94%', once: true}});
       });
+      const chart = app.querySelector('.group-chart');
+      if (chart) {
+        const tree = gsap.timeline({scrollTrigger: {trigger: chart, start: 'top 85%', once: true}});
+        tree.from(chart.querySelector('.group-parent'), {opacity: 0, y: 22, duration: .65, ease: 'power3.out', clearProps: 'opacity,transform'})
+          .from(chart.querySelectorAll('.company-node'), {opacity: 0, y: 24, duration: .55, stagger: .12, ease: 'power3.out', clearProps: 'opacity,transform'}, '-=.15')
+          .from(chart.querySelectorAll('.company-brands'), {opacity: 0, y: 14, duration: .5, stagger: .1, clearProps: 'opacity,transform'}, '-=.2');
+      }
       const statCleanups = [];
       app.querySelectorAll('.stat strong').forEach(el => {
         const original = el.textContent; const target = Number(original.replace(/[^0-9]/g, ''));
