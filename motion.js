@@ -32,12 +32,19 @@
         gsap.from('header .logo, header nav a', {opacity: 0, y: -8, duration: .5, stagger: .035, clearProps: 'opacity,transform'});
         initial = false;
       }
-      const reveals = app.querySelectorAll('.chairman-opening, .chairman-profile, .chairman-letter, .section .two > *, .section.two > *, .section-head, .image-frame, .news-card, .business-card, .value, .timeline > div, .contact-grid > *, .cta > *, .section > h2, .section > p, .section > .eyebrow, .brand-tabs, #feature');
+      const reveals = app.querySelectorAll('.career-story > *, .career-value, .career-life-next, .career-benefits-intro, .career-benefit, .career-ypp-intro, .career-ypp-card, .newsroom-feature > *, .newsroom-card, .newsroom-press, .company-card, .companies-intro, .foundation-figures, .foundation-story > *, .foundation-steps > li, .foundation-focus-card, .foundation-closing, .chairman-opening, .chairman-profile, .chairman-letter, .section .two > *, .section.two > *, .section-head, .image-frame, .news-card, .business-card, .value, .timeline > div, .contact-grid > *, .cta > *, .section > h2, .section > p, .section > .eyebrow, .brand-tabs, #feature');
       reveals.forEach(el => {
         // A parent reveal owns its descendants, preventing stacked transforms.
         if (Array.from(reveals).some(parent => parent !== el && parent.contains(el))) return;
         gsap.from(el, {opacity: .12, y: distance, duration: .65, ease: 'power2.out', clearProps: 'opacity,transform', scrollTrigger: {trigger: el, start: 'top 94%', once: true}});
       });
+      const journey = app.querySelector('.journey-page');
+      if (journey) {
+        journey.querySelectorAll('.journey-chapter').forEach(chapter => {
+          gsap.from(chapter.querySelectorAll('.journey-stop-marker, .journey-stop-content'), {y:20, opacity:0, duration:.8, stagger:.12, ease:'power2.out', clearProps:'opacity,transform', scrollTrigger:{trigger:chapter, start:'top 87%', once:true}});
+        });
+        gsap.from('.journey-future > *', {y:24, opacity:0, duration:.7, stagger:.09, clearProps:'opacity,transform', scrollTrigger:{trigger:'.journey-future', start:'top 80%', once:true}});
+      }
       const chart = app.querySelector('.group-chart');
       if (chart) {
         const tree = gsap.timeline({scrollTrigger: {trigger: chart, start: 'top 85%', once: true}});
@@ -58,5 +65,14 @@
       return () => {statCleanups.forEach(fn => fn()); app.querySelectorAll('.hero-media').forEach(el => el.remove());};
     });
   }
-  window.OMLMotion = {cleanup, mount, swap};
+  let roadTweens=[];
+  function refreshJourneyRoad(){
+    roadTweens.forEach(t=>{t.scrollTrigger?.kill();t.kill()});roadTweens=[];
+    if(!window.gsap||!window.ScrollTrigger||reduced())return;
+    document.querySelectorAll('.road-progress').forEach((path,i)=>{
+      roadTweens.push(gsap.fromTo(path,{strokeDasharray:1,strokeDashoffset:1},{strokeDashoffset:0,ease:'none',scrollTrigger:{trigger:document.getElementById('journey-chapter-'+i),start:'center 65%',endTrigger:document.getElementById('journey-chapter-'+(i+1)),end:'center 65%',invalidateOnRefresh:true,scrub:.5}}));
+    });
+  }
+  const originalCleanup=cleanup;
+  window.OMLMotion = {cleanup(){roadTweens.forEach(t=>{t.scrollTrigger?.kill();t.kill()});roadTweens=[];originalCleanup()}, mount, swap, refreshJourneyRoad};
 })();
