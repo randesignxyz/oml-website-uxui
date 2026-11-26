@@ -16,6 +16,14 @@
       const desktop = context.conditions.desktop;
       const distance = desktop ? 30 : 16;
       const app = document.querySelector('#app');
+      const careersPage = Boolean(app.querySelector('.career-subnav'));
+      let refreshFrame;
+      const refreshImages = () => {
+        cancelAnimationFrame(refreshFrame);
+        refreshFrame = requestAnimationFrame(() => ScrollTrigger.refresh());
+      };
+      const loadingImages = [...app.querySelectorAll('img')].filter(img => !img.complete);
+      loadingImages.forEach(img => img.addEventListener('load', refreshImages));
       const lead = app.querySelector('.hero, .page-hero');
       if (lead) {
         const intro = lead.querySelectorAll('.breadcrumb, .eyebrow, h1, p, .btn, .hero-bottom');
@@ -36,14 +44,14 @@
       reveals.forEach(el => {
         // A parent reveal owns its descendants, preventing stacked transforms.
         if (Array.from(reveals).some(parent => parent !== el && parent.contains(el))) return;
-        gsap.from(el, {opacity: .12, y: distance, duration: .65, ease: 'power2.out', clearProps: 'opacity,transform', scrollTrigger: {trigger: el, start: 'top 94%', once: true}});
+        // Careers content stays readable even when scrolling skips a reveal trigger.
+        gsap.from(el, {...(careersPage ? {} : {opacity: .12}), y: distance, duration: .65, ease: 'power2.out', clearProps: 'opacity,transform', scrollTrigger: {trigger: el, start: 'top 94%', once: true}});
       });
       const journey = app.querySelector('.journey-page');
       if (journey) {
         journey.querySelectorAll('.journey-chapter').forEach(chapter => {
           gsap.from(chapter.querySelectorAll('.journey-stop-marker, .journey-stop-content'), {y:20, opacity:0, duration:.8, stagger:.12, ease:'power2.out', clearProps:'opacity,transform', scrollTrigger:{trigger:chapter, start:'top 87%', once:true}});
         });
-        gsap.from('.journey-future > *', {y:24, opacity:0, duration:.7, stagger:.09, clearProps:'opacity,transform', scrollTrigger:{trigger:'.journey-future', start:'top 80%', once:true}});
       }
       const chart = app.querySelector('.group-chart');
       if (chart) {
@@ -62,7 +70,12 @@
       });
       const bar = document.querySelector('.reading-progress');
       if (bar) gsap.fromTo(bar, {scaleX: 0}, {scaleX: 1, ease: 'none', scrollTrigger: {trigger: document.documentElement, start: 0, end: 'max', scrub: .15}});
-      return () => {statCleanups.forEach(fn => fn()); app.querySelectorAll('.hero-media').forEach(el => el.remove());};
+      return () => {
+        cancelAnimationFrame(refreshFrame);
+        loadingImages.forEach(img => img.removeEventListener('load', refreshImages));
+        statCleanups.forEach(fn => fn());
+        app.querySelectorAll('.hero-media').forEach(el => el.remove());
+      };
     });
   }
   let roadTweens=[];
